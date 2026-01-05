@@ -12,7 +12,7 @@ async function connectdb() {
     }
 }
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     connectdb().then(() => {
