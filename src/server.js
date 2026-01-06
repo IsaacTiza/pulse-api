@@ -1,7 +1,17 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: 'config.env' });
-import mongoose from 'mongoose';
-import app from './app.js';
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, "..", "config.env") });
+import mongoose from "mongoose";
+import app from "./app.js";
+
+if (!process.env.MONGO_URI || typeof process.env.MONGO_URI !== "string") {
+  console.error(
+    "Missing or invalid MONGO_URI in environment. Check config.env"
+  );
+  process.exit(1);
+}
 
 async function connectdb() {
     try {

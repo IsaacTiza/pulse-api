@@ -1,5 +1,10 @@
+//Packages
 import express from 'express';
+import morgan from 'morgan';
+//Routers
 import authRouter from "./routes/authRoutes.js";
+import userRouter from "./routes/userRoute.js";
+//Utils & Middlewares
 import AppError from "./utils/appError.js";
 import globalErrorHandler from "./middlewares/errorMiddleware.js";
 
@@ -7,8 +12,17 @@ const app = express();
 
 app.use(express.json());
 
+app.use(morgan('dev'));
+//Test Router: Default Get Request
+app.get("/api/v1/test", (req, res) => {
+  res.send("API is working");
+});
+app.post("/api/v1/test", (req, res) => {
+  res.send(req.body);
+});
+//Mount Routers
 app.use("/api/v1", authRouter);
-app.use("/api/v1", authRouter);
+app.use("/api/v1", userRouter);
 
 // Handle unknown routes
 app.use((req, res, next) => {
