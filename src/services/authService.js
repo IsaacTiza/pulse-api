@@ -72,6 +72,8 @@ export const resetPassword = async (
   user.passwordConfirm = passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
+
+  user.passwordChangedAt = new Date();
   await user.save();
   return user;
 };
