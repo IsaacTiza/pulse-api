@@ -1,4 +1,4 @@
-import { registerUser, loginUser } from "../services/authService.js";
+import { registerUser, loginUser, forgotPassword, resetPassword } from "../services/authService.js";
 import { deleteUser, getProfile, updateUser } from "../services/userService.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
@@ -85,9 +85,34 @@ export const updateProfile = catchAsync(async (req, res) => {
   });
 });
 export const deleteAccount = catchAsync(async (req, res) => {
-    await deleteUser(req.user._id)
+    const deletedUser = await deleteUser(req.user._id);
     res.status(204).json({
         status: `success`,
-        message:`Account Deleted Successfully`,
+      message: `Account Deleted Successfully`,
+        data:{ deletedUser}
     })
 })
+export const forgetPassword= catchAsync(async (req, res) => {
+    const { email } = req.body;
+  if (!email) throw new AppError("Please provide email", 400);
+    const resetURL = await forgotPassword(email);
+    res.status(200).json({
+      status: `success`,
+      message: `Password reset token sent to email!`,
+      data: {
+        resetURL,
+      },
+    });
+});
+export const passwordReset= catchAsync(async (req, res) => {
+    const { resetToken } = req.params;
+  const { newPassword, passwordConfirm } = req.body;  
+  if (!newPassword || !passwordConfirm) {
+    throw new AppError("Please provide new password and password confirm", 400);
+  }
+    await resetPassword(resetToken, newPassword, passwordConfirm);
+    res.status(200).json({
+      status: `success`,
+      message: `Password reset successful! Please log in with your new password.`,
+    });
+}); 

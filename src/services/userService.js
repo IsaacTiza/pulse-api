@@ -18,9 +18,28 @@ return updatedUser
 };
 export const deleteUser = async (userId) => {
     //Implementing Soft Delete
-    let user = await userModel.findById(userId)
-    if (!user.isActive) throw new AppError('User as already been deleted', 401)
-    user.isActive = false
-    user.save()
-    return true
-}
+
+     return await userModel.findByIdAndUpdate(
+       userId,
+       {
+         isDeleted: true,
+         deletedAt: new Date(),
+       },
+       { new: true }
+     );
+};
+
+//  admin function to restore a soft-deleted user
+   export const restoreUser = async (userId) => {
+     return await userModel.findByIdAndUpdate(
+       userId,
+       {
+         isDeleted: false,
+         deletedAt: null,
+       },
+       { new: true }
+     );
+   };
+
+
+

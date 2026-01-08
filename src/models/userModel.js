@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
@@ -35,9 +36,15 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    isActive: {
+    isDeleted: {
       type: Boolean,
-      default: true,
+      default: false,
+      index: true,
+    },
+
+    deletedAt: {
+      type: Date,
+      default: null,
     },
     passwordChangedAt: Date,
     passwordResetToken: String,
@@ -67,6 +74,10 @@ userSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
 });
+userSchema.pre(/^find/, function () {
+  this.where({ isDeleted: false });
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -75,12 +86,21 @@ userSchema.methods.correctPassword = async function (
 };
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000
-    );
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000);
     return changedTimestamp > JWTTimestamp;
   }
   return false;
+};
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000 // 10 minutes
+  return resetToken;
 };
 
 export default mongoose.model("User", userSchema);

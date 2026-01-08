@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 import User from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
@@ -20,7 +21,7 @@ export const protect = catchAsync(async (req, res, next) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   const user = await User.findById(decoded.id);
-  if (!user || !user.isActive) {
+  if (!user || user.isDeleted) {
     return next(new AppError("Please Login!", 401));
   }
 
@@ -40,3 +41,4 @@ export const restrictTo = (...roles) => {
     next();
   };
 };
+
