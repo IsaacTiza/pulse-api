@@ -29,6 +29,8 @@ export const deleteUser = async (userId) => {
      );
 };
 
+
+//ADMIN SERVICES
 //  admin function to restore a soft-deleted user
    export const restoreUser = async (userId) => {
      return await userModel.findByIdAndUpdate(
@@ -39,7 +41,29 @@ export const deleteUser = async (userId) => {
        },
        { new: true }
      );
-   };
-
-
-
+};
+   export const getAllUsers = async () => {
+     return await userModel.find({ isDeleted: false });
+}
+export const createNewUser = async (data) => {
+  const newUser = await userModel.create(data);
+  return newUser;
+}
+export const getUserById = async (userId) => {
+  const user = await userModel.findById(userId);
+  if (!user || user.isDeleted) {
+    throw new AppError("User not found or deleted", 404);
+  }
+  return user;
+}
+export const hardDeleteUser = async (userId) => {
+  return await userModel.findByIdAndDelete(userId);
+}
+export const updateUserByAdmin = async (userId, data) => {
+  const updatedUser = await userModel.findByIdAndUpdate(
+    userId,
+    { $set: data },
+    { new: true, runValidators: true }
+  );
+  return updatedUser;
+};

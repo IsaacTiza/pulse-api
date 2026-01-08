@@ -1,5 +1,5 @@
 import { registerUser, loginUser, forgotPassword, resetPassword } from "../services/authService.js";
-import { deleteUser, getProfile, updateUser } from "../services/userService.js";
+import { createNewUser, deleteUser, getAllUsers, getProfile, getUserById, hardDeleteUser, restoreUser, updateUser, updateUserByAdmin } from "../services/userService.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 
@@ -116,3 +116,61 @@ export const passwordReset= catchAsync(async (req, res) => {
       message: `Password reset successful! Please log in with your new password.`,
     });
 }); 
+
+//ADMIN CONTROLLERS CAN BE ADDED HERE LATER
+export const adminGetAllUsers = catchAsync(async (req, res) => {
+    const users = await getAllUsers();
+    res.status(200).json({
+      status: `success`,
+      results: users.length,
+      data: {
+        users,
+      },
+    });
+});
+export const adminCreateUser = catchAsync(async (req, res) => {
+  const newUser = await createNewUser(req.body);
+  res.status(201).json({
+    status: `success`,
+    data: {
+      user: newUser,
+    },
+  });
+});
+export const adminGetUserById = catchAsync(async (req, res) => {
+  const user = await getUserById(req.params.id);
+  res.status(200).json({
+    status: `success`,
+    data: {
+      user,
+    },
+  });
+});
+export const adminHardDeleteUser = catchAsync(async (req, res) => {
+  await hardDeleteUser(req.params.id);
+  res.status(204).json({
+    status: `success`,
+    message: `User permanently deleted`,
+    data: null,
+  });
+})
+export const adminUpdateUserById = catchAsync(async (req, res) => {
+  const updatedUser = await updateUserByAdmin(req.params.id, req.body);
+  res.status(200).json({  
+    status: `success`,
+    message: `User updated successfully`,
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+export const adminRestoreUser = catchAsync(async (req, res) => {
+    const restoredUser = await restoreUser(req.params.id);
+  res.status(200).json({
+    status: `success`,
+    message: `User restored successfully`,
+    data: {
+      user: restoredUser,
+    },
+  });
+});
