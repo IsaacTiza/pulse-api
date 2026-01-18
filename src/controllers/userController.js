@@ -119,7 +119,8 @@ export const passwordReset= catchAsync(async (req, res) => {
 
 //ADMIN CONTROLLERS CAN BE ADDED HERE LATER
 export const adminGetAllUsers = catchAsync(async (req, res) => {
-    const users = await getAllUsers();
+  console.log(req.query)
+    const users = await getAllUsers(req.query);
     res.status(200).json({
       status: `success`,
       results: users.length,
@@ -148,7 +149,7 @@ export const adminGetUserById = catchAsync(async (req, res) => {
 });
 export const adminHardDeleteUser = catchAsync(async (req, res) => {
   await hardDeleteUser(req.params.id);
-  res.status(204).json({
+  res.status(200).json({
     status: `success`,
     message: `User permanently deleted`,
     data: null,

@@ -1,5 +1,8 @@
 import userModel from "../models/userModel.js";
 import AppError from "../utils/appError.js";
+import APIFeatures from "../utils/APIfeatures.js";
+
+//USER SERVICES
 
 export const getProfile = async (userId) => {
   const existingUser = await userModel.findById(userId);
@@ -42,8 +45,14 @@ export const deleteUser = async (userId) => {
        { new: true }
      );
 };
-   export const getAllUsers = async () => {
-     return await userModel.find({ isDeleted: false });
+   export const getAllUsers = async (query) => {
+     const features = new APIFeatures(userModel.find(),query)
+       .filter()
+       .sort()
+       .limitFields()
+       .paginate();
+
+   return  await features.query;
 }
 export const createNewUser = async (data) => {
   const newUser = await userModel.create(data);

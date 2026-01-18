@@ -1,6 +1,7 @@
 //Packages
 import express from 'express';
 import morgan from 'morgan';
+import qs from 'qs';
 //Routers
 import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoute.js";
@@ -11,7 +12,8 @@ import globalErrorHandler from "./middlewares/errorMiddleware.js";
 const app = express();
 
 app.use(express.json());
-
+// Use qs for parsing query strings
+app.set('query parser', str => qs.parse(str));
 app.use(morgan('dev'));
 //Test Router: Default Get Request
 app.get("/api/v1/test", (req, res) => {
