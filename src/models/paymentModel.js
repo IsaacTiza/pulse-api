@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const paymentSchema = mongoose.Schema(
   {
     user: {
-      type: mongoose.schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
     amount: {

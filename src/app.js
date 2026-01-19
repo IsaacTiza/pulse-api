@@ -6,6 +6,7 @@ import qs from 'qs';
 import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoute.js";
 import paymentRoute from "./routes/paymentRoute.js"
+import productRoute from "./routes/productsRoutes.js"
 //Utils & Middlewares
 import AppError from "./utils/appError.js";
 import globalErrorHandler from "./middlewares/errorMiddleware.js";
@@ -27,6 +28,7 @@ app.post("/api/v1/test", (req, res) => {
 app.use("/api/v1", authRouter);
 app.use("/api/v1", userRouter);
 app.use("/api/v1", paymentRoute)
+app.use("/api/v1", productRoute)
 
 // Handle unknown routes
 app.use((req, res, next) => {

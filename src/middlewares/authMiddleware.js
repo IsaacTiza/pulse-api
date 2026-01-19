@@ -43,7 +43,7 @@ export const restrictTo = (...roles) => {
 };
 
 export const requirePro = (req, res, next) => {
-  if(req.user.role !== 'pro'){
+  if(req.user.subscription.plan !== 'pro'){
     return next(new AppError("This feature is available for Pro users only. Please upgrade your account.", 403));
   }
   if (req.user.expireAt <= Date.now()) {
