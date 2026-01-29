@@ -1,6 +1,8 @@
 import userModel from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIfeatures.js";
+import redis from "../cache/redis.js";
+import { cacheKeys } from "../cache/cachedKeys.js";
 
 //USER SERVICES
 
@@ -45,7 +47,21 @@ export const deleteUser = async (userId) => {
        { new: true }
      );
 };
-   export const getAllUsers = async (query) => {
+export const getAllUsers = async (query) => {
+  const cachedPlans = await redis.get(cacheKeys.allUsers)
+  if (cachedPlans) {
+    const features = new APIFeatures(userModel.find(), query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    return await features.query;
+    
+  }
+  const users  = await userModel.find();
+  redis.set(cacheKeys.allUsers, JSON.stringify(users), 'EX', 3600); // Cache for 1 hour
+  
      const features = new APIFeatures(userModel.find(),query)
        .filter()
        .sort()

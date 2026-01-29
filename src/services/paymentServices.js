@@ -6,7 +6,8 @@ export const upgradingToProPlan = async (userId,amount) => {
     const user = await userModel.findByIdAndUpdate(userId, {
         $set: {
             "subscription.plan": "pro",
-            "subscription.status":"active"
+            "subscription.status": "active",
+            "expiresAt":Date.now()
         },
         
     }, { new: true })
